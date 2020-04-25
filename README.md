@@ -22,6 +22,22 @@ Download `config.yaml.example` to `$HOME/.config/twitchlive/config`
 
 `twitchlive`
 
+Usage:
+
+```
+Usage for twitchlive:
+  -delimiter string
+    	string to separate entires when printing (default " @@@ ")
+  -output-format string
+    	possible values: 'basic', 'table', 'json' (default "basic")
+  -timestamp
+    	print unix timestamp instead of stream duration
+  -timestamp-seconds
+    	print seconds since epoch instead of unix timestamp
+  -username string
+    	specify user to get live channels for
+```
+
 ### Dependencies:
 
 [go](https://golang.org/), make sure your `$GOPATH` and `$GOBIN` environment variables are set.
