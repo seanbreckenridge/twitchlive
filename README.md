@@ -4,13 +4,13 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 
 ### Setup
 
-* Twitch API
-    * Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
-    * Click 'Manage' and save your `ClientID`.
-    * Download `config.yaml.example` to `$HOME/.config/twitchlive/config`, and modify so that it has your twitch `user_name`/`client_id`
-* Go/Install `twitchlive`
-    * Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
-    * Run: `go get -u "github.com/seanbreckenridge/twitchlive"`
+- Twitch API
+  - Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
+  - Click 'Manage' and save your `ClientID`.
+  - Download `config.yaml.example` to `$HOME/.config/twitchlive/config`, and modify so that it has your twitch `username`/`client_id`
+- Go/Install `twitchlive`
+  - Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
+  - Run: `go get -u "github.com/seanbreckenridge/twitchlive"`
 
 ## Run
 
@@ -77,4 +77,4 @@ Usage for twitchlive:
     	specify user to get live channels for
 ```
 
-Passing the `username` flag overrides the `user_name` set in `~/.config/twitchlive/config`
+Passing the `username` flag overrides the `username` set in `~/.config/twitchlive/config`

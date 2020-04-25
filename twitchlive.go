@@ -107,7 +107,7 @@ func GetConfig() *config {
 	}
 	// default to username from config file if one wasnt set
 	if *username == "" {
-		(*username) = viper.GetString("user_name")
+		(*username) = viper.GetString("username")
 	}
 	return &config{
 		clientId:          viper.GetString("client_id"),
