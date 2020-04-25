@@ -29,23 +29,15 @@ const (
 )
 
 type liveChannelInfo struct {
-	user_name      string
-	title          string
-	viewer_count   int
+	User_name      string `json:"user_name"`
+	Title          string `json:"title"`
+	Viewer_count   int    `json:"viewer_count"`
 	started_at     time.Time
-	formatted_time string
+	Formatted_time string `json:"time"`
 }
 
 type jsonContainer struct {
-	Channels []liveChannelJson `json:"channels"`
-}
-
-// a class to allow json encoding without the started_at field
-type liveChannelJson struct {
-	User_name    string `json:"user_name"`
-	Title        string `json:"title"`
-	Viewer_count int    `json:"viewer_count"`
-	Time         string `json:"time"`
+	Channels []liveChannelInfo `json:"channels"`
 }
 
 // Configuration passed from user using flags and config file
@@ -243,9 +235,9 @@ func getLiveUsers(conf *config, followedUsers []string) []liveChannelInfo {
 		for _, lc := range liveChannelData {
 			lc_time, _ := time.Parse(time.RFC3339, lc.Get("started_at").String())
 			liveChannels = append(liveChannels, liveChannelInfo{
-				user_name:    lc.Get("user_name").String(),
-				title:        lc.Get("title").String(),
-				viewer_count: int(lc.Get("viewer_count").Float()),
+				User_name:    lc.Get("user_name").String(),
+				Title:        lc.Get("title").String(),
+				Viewer_count: int(lc.Get("viewer_count").Float()),
 				started_at:   lc_time,
 			})
 		}
@@ -267,9 +259,9 @@ func main() {
 	// format output according to flags
 	for index, live_user := range liveUsers {
 		if conf.timestamp_seconds {
-			liveUsers[index].formatted_time = strconv.Itoa(int(live_user.started_at.Unix()))
+			liveUsers[index].Formatted_time = strconv.Itoa(int(live_user.started_at.Unix()))
 		} else if conf.timestamp {
-			liveUsers[index].formatted_time = live_user.started_at.Format(time.UnixDate)
+			liveUsers[index].Formatted_time = live_user.started_at.Format(time.UnixDate)
 		} else {
 			// default, display how long they've been in live
 			timeDiff := time.Now().Sub(live_user.started_at)
@@ -277,7 +269,7 @@ func main() {
 			hours := timeDiff / time.Hour
 			timeDiff -= hours * time.Hour
 			minutes := timeDiff / time.Minute
-			liveUsers[index].formatted_time = fmt.Sprintf("%02d:%02d", hours, minutes)
+			liveUsers[index].Formatted_time = fmt.Sprintf("%02d:%02d", hours, minutes)
 		}
 	}
 
@@ -285,23 +277,14 @@ func main() {
 	case OutputFormatBasic:
 		for _, live_user := range liveUsers {
 			fmt.Println(strings.Join([]string{
-				live_user.user_name,
-				live_user.formatted_time,
-				strconv.Itoa(live_user.viewer_count),
-				live_user.title},
+				live_user.User_name,
+				live_user.Formatted_time,
+				strconv.Itoa(live_user.Viewer_count),
+				live_user.Title},
 				(*conf).delimiter))
 		}
 	case OutputFormatJson:
-		liveUsersJson := make([]liveChannelJson, len(liveUsers))
-		for index, live_user := range liveUsers {
-			liveUsersJson[index] = liveChannelJson{
-				User_name:    live_user.user_name,
-				Title:        live_user.title,
-				Viewer_count: live_user.viewer_count,
-				Time:         live_user.formatted_time,
-			}
-		}
-		jsonBytes, err := json.Marshal(&jsonContainer{Channels: liveUsersJson})
+		jsonBytes, err := json.Marshal(&jsonContainer{Channels: liveUsers})
 		if err != nil {
 			log.Fatalf("Error encoding to JSON: %s\n", err)
 		}
@@ -310,10 +293,10 @@ func main() {
 		tableData := make([][]string, len(liveUsers))
 		for index, live_user := range liveUsers {
 			tableData[index] = []string{
-				live_user.user_name,
-				live_user.formatted_time,
-				strconv.Itoa(live_user.viewer_count),
-				live_user.title,
+				live_user.User_name,
+				live_user.Formatted_time,
+				strconv.Itoa(live_user.Viewer_count),
+				live_user.Title,
 			}
 		}
 		table := tablewriter.NewWriter(os.Stdout)
