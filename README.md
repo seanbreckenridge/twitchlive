@@ -1,6 +1,6 @@
 # twitch-live
 
-A CLI tool to list which channels you follow are currently live.
+A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow are currently live.
 
 ### Setup
 
@@ -12,7 +12,7 @@ See [here](https://dev.twitch.tv/docs/api) for a more extensive tutorial.
 
 Install the binary:
 
-`go get -v -u "github.com/seanbreckenridge/twitch-live"`
+`go get -u "github.com/seanbreckenridge/twitch-live"`
 
 Modify the config.example and place that at `$HOME/.config/twitch-live/config`
 
