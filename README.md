@@ -6,19 +6,17 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 
 Go to [the dev console](https://dev.twitch.tv/console/apps) and create a application, you can use `http://localhost` as the callback URL, it won't be used for this application.
 
-Click 'Manage' and save the ClientID.
-
-See [here](https://dev.twitch.tv/docs/api) for a more extensive tutorial.
+Click 'Manage' and save your `ClientID`.
 
 Install the binary:
 
 `go get -u "github.com/seanbreckenridge/twitch-live"`
 
-Modify the config.example and place that at `$HOME/.config/twitch-live/config`
+Download `config.yaml.example` to `$HOME/.config/twitch-live/config`
 
 `curl --output "$HOME/.config/twitch-live/config" --create-dirs "https://raw.githubusercontent.com/seanbreckenridge/twitch-live/master/config.yaml.example"`
 
-The `user_name` is your twitch username, or the user for who you want to get currently live channels for.
+... and modify it so that it has your twitch `user_name`/`client_id`
 
 ### Run
 
