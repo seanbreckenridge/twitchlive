@@ -118,7 +118,7 @@ func makeRequest(request *http.Request, client *http.Client) (*http.Response, st
 	// make request
 	response, err := client.Do(request)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error making HTTP request: %s\n", err)
 	}
 	// check response
 	defer response.Body.Close()
@@ -126,7 +126,7 @@ func makeRequest(request *http.Request, client *http.Client) (*http.Response, st
 	respBody := string(respBytes)
 	// dump information to screen and exit if it failed
 	if response.StatusCode >= 400 {
-		log.Printf("Requesting %s failed with status code %s", request.URL, response.StatusCode)
+		log.Printf("Requesting %s failed with status code %d\n", request.URL.String(), response.StatusCode)
 		log.Printf("%s\n", respBody)
 		os.Exit(1)
 	}
