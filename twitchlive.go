@@ -67,7 +67,7 @@ func parseOutputFormat(format *string) (OutputFormat, error) {
 
 // read the configuration from command line flags
 // and the configuration file
-func GetConfig() *config {
+func getConfig() *config {
 
 	// customize flag usage prefix message to include a description message
 	flag.Usage = func() {
@@ -249,8 +249,7 @@ func getLiveUsers(conf *config, client *http.Client, followedUsers []string) []l
 
 func main() {
 
-	// parse configuration
-	conf := GetConfig()
+	conf := getConfig()
 
 	// make requests to twitch API
 	client := &http.Client{}
