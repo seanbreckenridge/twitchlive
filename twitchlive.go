@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
 )
@@ -67,9 +68,7 @@ func parseOutputFormat(format *string) (OutputFormat, error) {
 		OutputFormatJson:
 		return passedFormat, nil
 	}
-	return OutputFormatBasic, fmt.Errorf("Could not find '%s' in allowed output formats. Run %s -h for a full list.",
-		(*format),
-		os.Args[0])
+	return OutputFormatBasic, fmt.Errorf("Could not find '%s' in allowed output formats. Run %s -h for a full list.", (*format), os.Args[0])
 }
 
 // read the configuration from command line flags
@@ -268,9 +267,9 @@ func main() {
 	// format output according to flags
 	for index, live_user := range liveUsers {
 		if conf.timestamp_seconds {
-			liveUsers[index].formatted_time = live_user.started_at.Format(time.UnixDate)
-		} else if conf.timestamp {
 			liveUsers[index].formatted_time = strconv.Itoa(int(live_user.started_at.Unix()))
+		} else if conf.timestamp {
+			liveUsers[index].formatted_time = live_user.started_at.Format(time.UnixDate)
 		} else {
 			// default, display how long they've been in live
 			timeDiff := time.Now().Sub(live_user.started_at)
@@ -285,10 +284,11 @@ func main() {
 	switch conf.output_format {
 	case OutputFormatBasic:
 		for _, live_user := range liveUsers {
-			fmt.Println(strings.Join([]string{live_user.user_name,
-				live_user.title,
+			fmt.Println(strings.Join([]string{
+				live_user.user_name,
+				live_user.formatted_time,
 				strconv.Itoa(live_user.viewer_count),
-				live_user.formatted_time},
+				live_user.title},
 				(*conf).delimiter))
 		}
 	case OutputFormatJson:
@@ -307,7 +307,23 @@ func main() {
 		}
 		fmt.Printf(string(jsonBytes))
 	case OutputFormatTable:
-		fmt.Fprintf(os.Stderr, "Output Type '%s' is not implemented yet... FeelsBadMan\n", conf.output_format)
-		os.Exit(1)
+		tableData := make([][]string, len(liveUsers))
+		for index, live_user := range liveUsers {
+			tableData[index] = []string{
+				live_user.user_name,
+				live_user.formatted_time,
+				strconv.Itoa(live_user.viewer_count),
+				live_user.title,
+			}
+		}
+		table := tablewriter.NewWriter(os.Stdout)
+		header := []string{"User", "Uptime", "Viewer Count", "Stream Title"}
+		if conf.timestamp_seconds || conf.timestamp {
+			header[1] = "Live Since"
+		}
+		table.SetHeader(header)
+		table.AppendBulk(tableData)
+		table.Render()
+
 	}
 }
