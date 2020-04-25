@@ -29,7 +29,7 @@ const (
 )
 
 type liveChannelInfo struct {
-	User_name      string `json:"user_name"`
+	User_name      string `json:"username"`
 	Title          string `json:"title"`
 	Viewer_count   int    `json:"viewer_count"`
 	started_at     time.Time
