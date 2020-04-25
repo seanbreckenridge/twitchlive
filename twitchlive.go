@@ -41,9 +41,11 @@ type jsonContainer struct {
 }
 
 // Configuration passed from user using flags and config file
+// and additional metadata (user id) pass around with requests
 type config struct {
 	clientId          string
 	user_name         string
+	user_id           string
 	delimiter         string
 	output_format     OutputFormat
 	timestamp         bool
@@ -112,9 +114,8 @@ func GetConfig() *config {
 }
 
 // makes an HTTP request and returns the response and body, as long as its valid
-func makeRequest(request *http.Request) (*http.Response, string) {
-	// create client and make request
-	client := &http.Client{}
+func makeRequest(request *http.Request, client *http.Client) (*http.Response, string) {
+	// make request
 	response, err := client.Do(request)
 	if err != nil {
 		panic(err)
@@ -133,7 +134,7 @@ func makeRequest(request *http.Request) (*http.Response, string) {
 }
 
 // get the twitch user id for a twitch user_name
-func getUserId(conf *config) string {
+func getUserId(conf *config, client *http.Client) string {
 	req, _ := http.NewRequest("GET", BASEURL+"users", nil)
 	// set client header
 	req.Header.Set("Client-Id", conf.clientId)
@@ -142,7 +143,7 @@ func getUserId(conf *config) string {
 	q.Add("login", conf.user_name)
 	req.URL.RawQuery = q.Encode()
 
-	_, respBody := makeRequest(req)
+	_, respBody := makeRequest(req, client)
 
 	// get userIdStr from JSON response
 	return gjson.Get(respBody, "data.0.id").String()
@@ -150,14 +151,14 @@ func getUserId(conf *config) string {
 
 // get which channels this user is following
 // puts response into followedUsers
-func getFollowingChannels(conf *config, userId string, paginationCursor *string, followedUsers []string) []string {
+func getFollowingChannels(conf *config, client *http.Client, paginationCursor *string, followedUsers []string) []string {
 	// create request
 	req, _ := http.NewRequest("GET", BASEURL+"users/follows", nil)
 	req.Header.Set("Client-Id", conf.clientId)
 
 	// create query
 	q := req.URL.Query()
-	q.Add("from_id", userId)
+	q.Add("from_id", conf.user_id)
 	q.Add("first", "100")
 	// if this has been called recursively, set the pagination cursor
 	// to get the next page of results
@@ -167,7 +168,7 @@ func getFollowingChannels(conf *config, userId string, paginationCursor *string,
 	req.URL.RawQuery = q.Encode()
 
 	// make request and get response body
-	_, respBody := makeRequest(req)
+	_, respBody := makeRequest(req, client)
 
 	// get number of channels this user follows
 	followCount := int(gjson.Get(respBody, "total").Float())
@@ -179,7 +180,7 @@ func getFollowingChannels(conf *config, userId string, paginationCursor *string,
 	// if we havent got all of the items yet, do a recursive call
 	if len(followedUsers) < followCount {
 		cursor := gjson.Get(respBody, "pagination.cursor").String()
-		followedUsers = getFollowingChannels(conf, userId, &cursor, followedUsers)
+		followedUsers = getFollowingChannels(conf, client, &cursor, followedUsers)
 	}
 
 	return followedUsers
@@ -220,7 +221,7 @@ func createLiveUsersURL(conf *config, followedUsers []string, startAt int, endAt
 // Since you can only specify 100 IDs,
 // and you also return 100 IDs at a time using the 'first' param,
 // pagination isnt needed on this endpoint.
-func getLiveUsers(conf *config, followedUsers []string) []liveChannelInfo {
+func getLiveUsers(conf *config, client *http.Client, followedUsers []string) []liveChannelInfo {
 
 	// instantiate return array
 	liveChannels := make([]liveChannelInfo, 0)
@@ -229,7 +230,7 @@ func getLiveUsers(conf *config, followedUsers []string) []liveChannelInfo {
 	for loopCond := curAt < len(followedUsers); loopCond; loopCond = curAt < len(followedUsers) {
 		req, curAt = createLiveUsersURL(conf, followedUsers, curAt, curAt+100)
 		// make the request for this chunk of IDs
-		_, requestBody := makeRequest(req)
+		_, requestBody := makeRequest(req, client)
 		liveChannelData := gjson.Parse(requestBody).Get("data").Array()
 		// grab information from each of items in the array
 		for _, lc := range liveChannelData {
@@ -252,9 +253,10 @@ func main() {
 	conf := GetConfig()
 
 	// make requests to twitch API
-	userId := getUserId(conf)
-	followedUsers := getFollowingChannels(conf, userId, nil, make([]string, 0))
-	liveUsers := getLiveUsers(conf, followedUsers)
+	client := &http.Client{}
+	(*conf).user_id = getUserId(conf, client)
+	followedUsers := getFollowingChannels(conf, client, nil, make([]string, 0))
+	liveUsers := getLiveUsers(conf, client, followedUsers)
 
 	// format output according to flags
 	for index, live_user := range liveUsers {
