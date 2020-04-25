@@ -135,7 +135,7 @@ func makeRequest(request *http.Request, client *http.Client) (*http.Response, st
 	// dump information to screen and exit if it failed
 	if response.StatusCode >= 400 {
 		log.Printf("Requesting %s failed with status code %d\n", request.URL.String(), response.StatusCode)
-		log.Printf("%s\n", respBody)
+		log.Println(respBody)
 		os.Exit(1)
 	}
 	return response, respBody
@@ -265,6 +265,7 @@ func main() {
 	followedUsers := getFollowingChannels(conf, client, nil, make([]string, 0))
 	liveUsers := getLiveUsers(conf, client, followedUsers)
 
+	now := time.Now()
 	// format output according to flags
 	for index, live_user := range liveUsers {
 		if conf.timestamp_seconds {
@@ -273,7 +274,7 @@ func main() {
 			liveUsers[index].Formatted_time = live_user.started_at.Format(time.UnixDate)
 		} else {
 			// default, display how long they've been in live
-			timeDiff := time.Now().Sub(live_user.started_at)
+			timeDiff := now.Sub(live_user.started_at)
 			// format into HH:MM
 			hours := timeDiff / time.Hour
 			timeDiff -= hours * time.Hour
@@ -316,6 +317,5 @@ func main() {
 		table.SetHeader(header)
 		table.AppendBulk(tableData)
 		table.Render()
-
 	}
 }
