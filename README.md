@@ -17,7 +17,7 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 Basic Text Output:
 
 ```
-twitchlive # uses username in ~/.config/twitchlive/config
+$ twitchlive # uses username in ~/.config/twitchlive/config
 ```
 
 You can use the `--delimeter` flag to specify what to separate each field with.
@@ -47,7 +47,9 @@ JSON:
 As an example use case, get average viewer count of channels I follow which are currently live:
 
 ```
-$ twitchlive -output-format=json | jq -r '.channels | .[] | "\(.viewer_count)"' | awk '{total += $0} END { print int(total/NR) }'
+$ twitchlive -output-format=json \
+| jq -r '.channels | .[] | "\(.viewer_count)"'\
+| awk '{total += $0} END { print int(total/NR) }'
 5611
 ```
 
