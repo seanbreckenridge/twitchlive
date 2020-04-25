@@ -1,9 +1,8 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"github.com/spf13/viper"
-	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,40 +10,100 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
+	"github.com/tidwall/gjson"
 )
 
 const BASEURL = "https://api.twitch.tv/helix/"
+const DESCRIPTION = "A CLI tool to list which twitch channels you follow are currently live."
+
+type OutputFormat string
+
+const (
+	OutputFormatBasic OutputFormat = "basic"
+	OutputFormatTable              = "table"
+	OutputFormatJson               = "json"
+)
+
+type liveChannel struct {
+	user_name      string
+	title          string
+	viewer_count   int
+	started_at     time.Time
+	formatted_time string
+}
 
 // Configuration passed from user using flags and config file
 type config struct {
-	port      int
-	clientId  string
-	user_name string
+	clientId          string
+	user_name         string
+	delimiter         string
+	output_format     OutputFormat
+	timestamp         bool
+	timestamp_seconds bool
 }
 
-type liveChannel struct {
-	user_name    string
-	title        string
-	viewer_count int
-	started_at   time.Time
+// validates if the OutputFormat string is one of the allowed values
+func parseOutputFormat(format *string) (OutputFormat, error) {
+	passedFormat := OutputFormat(*format)
+	switch passedFormat {
+	case
+		OutputFormatBasic,
+		OutputFormatTable,
+		OutputFormatJson:
+		return passedFormat, nil
+	}
+	return OutputFormatBasic, fmt.Errorf("Could not find '%s' in allowed output formats. Run %s -h for a full list.",
+		(*format),
+		os.Args[0])
 }
 
 // read the configuration from command line flags
 // and the configuration file
 func GetConfig() *config {
-	// read flags
+
+	// customize flag usage prefix message to include a description message
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s\n\nUsage for %s:\n", DESCRIPTION, os.Args[0])
+		flag.PrintDefaults()
+	}
+	// define command line flags
+	delimiter := flag.String("delimiter", " @@@ ", "string to separate entires when printing")
+	username := flag.String("username", "", "specify user to get live channels for")
+	output_format_str := flag.String("output-format", "basic", "possible values: 'basic', 'table', 'json'")
+	timestamp := flag.Bool("timestamp", false, "print a unix timestamp instead of stream duration")
+	timestamp_seconds := flag.Bool("timestamp-seconds", false, "print seconds since epoch instead of unix timestamp")
+
+	// parse command line flags
+	flag.Parse()
+
+	// validate output format
+	output_format, err := parseOutputFormat(output_format_str)
+	if err != nil {
+		log.Fatalf("%s\n", err)
+	}
+
 	// TODO: add json output, and a nicer table output as flags
 	// read configuration file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("$XDG_CONFIG_HOME/twitch-live")
-	viper.AddConfigPath("$HOME/.config/twitch-live")
+	viper.AddConfigPath("$XDG_CONFIG_HOME/twitchlive")
+	viper.AddConfigPath("$HOME/.config/twitchlive")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file: %s\n", err)
 	}
+	// default to username from config file if one wasnt set
+	if *username == "" {
+		(*username) = viper.GetString("user_name")
+	}
 	return &config{
-		clientId:  viper.GetString("client_id"),
-		user_name: viper.GetString("user_name"),
+		clientId:          viper.GetString("client_id"),
+		user_name:         *username,
+		delimiter:         *delimiter,
+		output_format:     output_format,
+		timestamp:         *timestamp,
+		timestamp_seconds: *timestamp_seconds,
 	}
 }
 
@@ -184,17 +243,45 @@ func getLiveUsers(conf *config, followedUsers []string) []liveChannel {
 }
 
 func main() {
+
+	// parse configuration
 	conf := GetConfig()
-	// fmt.Printf("%+v\n", *conf)
+
+	// make requests to twitch API
 	userId := getUserId(conf)
 	followedUsers := getFollowingChannels(conf, userId, nil, make([]string, 0))
-	getLiveUsers := getLiveUsers(conf, followedUsers)
-	delimiter := " @@@ "
-	for _, live_user := range getLiveUsers {
-		fmt.Println(strings.Join([]string{
-			live_user.user_name,
-			live_user.title,
-			strconv.Itoa(live_user.viewer_count),
-			live_user.started_at.Format(time.UnixDate)}, delimiter))
+	liveUsers := getLiveUsers(conf, followedUsers)
+
+	// format output according to flags
+	for index, live_user := range liveUsers {
+		if conf.timestamp_seconds {
+			liveUsers[index].formatted_time = live_user.started_at.Format(time.UnixDate)
+		} else if conf.timestamp {
+			liveUsers[index].formatted_time = strconv.Itoa(int(live_user.started_at.Unix()))
+		} else {
+			// default, display how long they've been in live
+			timeDiff := time.Now().Sub(live_user.started_at)
+			// format into HH:MM
+			hours := timeDiff / time.Hour
+			timeDiff -= hours * time.Hour
+			minutes := timeDiff / time.Minute
+			liveUsers[index].formatted_time = fmt.Sprintf("%02d:%02d", hours, minutes)
+		}
 	}
+
+	switch conf.output_format {
+	case OutputFormatBasic:
+		for _, live_user := range liveUsers {
+			fmt.Println(strings.Join([]string{live_user.user_name,
+				live_user.title,
+				strconv.Itoa(live_user.viewer_count),
+				live_user.formatted_time},
+				(*conf).delimiter))
+		}
+	case OutputFormatTable,
+		OutputFormatJson:
+		fmt.Fprintf(os.Stderr, "Output Type '%s' is not implemented yet... FeelsBadMan\n", conf.output_format)
+		os.Exit(1)
+	}
+
 }
