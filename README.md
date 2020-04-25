@@ -1,4 +1,4 @@
-# twitch-live
+# twitchlive
 
 A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow are currently live.
 
@@ -10,17 +10,17 @@ Click 'Manage' and save your `ClientID`.
 
 Install the binary:
 
-`go get -u "github.com/seanbreckenridge/twitch-live"`
+`go get -u "github.com/seanbreckenridge/twitchlive"`
 
-Download `config.yaml.example` to `$HOME/.config/twitch-live/config`
+Download `config.yaml.example` to `$HOME/.config/twitchlive/config`
 
-`curl --output "$HOME/.config/twitch-live/config" --create-dirs "https://raw.githubusercontent.com/seanbreckenridge/twitch-live/master/config.yaml.example"`
+`curl --output "$HOME/.config/twitchlive/config" --create-dirs "https://raw.githubusercontent.com/seanbreckenridge/twitchlive/master/config.yaml.example"`
 
 ... and modify it so that it has your twitch `user_name`/`client_id`
 
 ### Run
 
-`twitch-live`
+`twitchlive`
 
 ### Dependencies:
 
