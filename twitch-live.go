@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -119,6 +121,7 @@ func getFollowingChannels(conf *config, userId string, paginationCursor *string,
 
 	return followedUsers
 }
+
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -186,8 +189,12 @@ func main() {
 	userId := getUserId(conf)
 	followedUsers := getFollowingChannels(conf, userId, nil, make([]string, 0))
 	getLiveUsers := getLiveUsers(conf, followedUsers)
-	for _, id := range getLiveUsers {
-		fmt.Printf("+%v\n", id)
-		fmt.Printf("%s", id.started_at.Format(time.UnixDate))
+	delimiter := " @@@ "
+	for _, live_user := range getLiveUsers {
+		fmt.Println(strings.Join([]string{
+			live_user.user_name,
+			live_user.title,
+			strconv.Itoa(live_user.viewer_count),
+			live_user.started_at.Format(time.UnixDate)}, delimiter))
 	}
 }
