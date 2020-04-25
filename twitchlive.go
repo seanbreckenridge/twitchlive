@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -26,12 +27,24 @@ const (
 	OutputFormatJson               = "json"
 )
 
-type liveChannel struct {
+type liveChannelInfo struct {
 	user_name      string
 	title          string
 	viewer_count   int
 	started_at     time.Time
 	formatted_time string
+}
+
+type jsonContainer struct {
+	Channels []liveChannelJson `json:"channels"`
+}
+
+// a class to allow json encoding without the started_at field
+type liveChannelJson struct {
+	User_name    string `json:"user_name"`
+	Title        string `json:"title"`
+	Viewer_count int    `json:"viewer_count"`
+	Time         string `json:"time"`
 }
 
 // Configuration passed from user using flags and config file
@@ -216,10 +229,10 @@ func createLiveUsersURL(conf *config, followedUsers []string, startAt int, endAt
 // Since you can only specify 100 IDs,
 // and you also return 100 IDs at a time using the 'first' param,
 // pagination isnt needed on this endpoint.
-func getLiveUsers(conf *config, followedUsers []string) []liveChannel {
+func getLiveUsers(conf *config, followedUsers []string) []liveChannelInfo {
 
 	// instantiate return array
-	liveChannels := make([]liveChannel, 0)
+	liveChannels := make([]liveChannelInfo, 0)
 	curAt := 0 // where the current index in the followedUsers list is
 	var req *http.Request
 	for loopCond := curAt < len(followedUsers); loopCond; loopCond = curAt < len(followedUsers) {
@@ -230,7 +243,7 @@ func getLiveUsers(conf *config, followedUsers []string) []liveChannel {
 		// grab information from each of items in the array
 		for _, lc := range liveChannelData {
 			lc_time, _ := time.Parse(time.RFC3339, lc.Get("started_at").String())
-			liveChannels = append(liveChannels, liveChannel{
+			liveChannels = append(liveChannels, liveChannelInfo{
 				user_name:    lc.Get("user_name").String(),
 				title:        lc.Get("title").String(),
 				viewer_count: int(lc.Get("viewer_count").Float()),
@@ -278,10 +291,23 @@ func main() {
 				live_user.formatted_time},
 				(*conf).delimiter))
 		}
-	case OutputFormatTable,
-		OutputFormatJson:
+	case OutputFormatJson:
+		liveUsersJson := make([]liveChannelJson, len(liveUsers))
+		for index, live_user := range liveUsers {
+			liveUsersJson[index] = liveChannelJson{
+				User_name:    live_user.user_name,
+				Title:        live_user.title,
+				Viewer_count: live_user.viewer_count,
+				Time:         live_user.formatted_time,
+			}
+		}
+		jsonBytes, err := json.Marshal(&jsonContainer{Channels: liveUsersJson})
+		if err != nil {
+			log.Fatalf("Error encoding to JSON: %s\n", err)
+		}
+		fmt.Printf(string(jsonBytes))
+	case OutputFormatTable:
 		fmt.Fprintf(os.Stderr, "Output Type '%s' is not implemented yet... FeelsBadMan\n", conf.output_format)
 		os.Exit(1)
 	}
-
 }
