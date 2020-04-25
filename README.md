@@ -4,13 +4,13 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 
 ### Setup
 
-* Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
-* Click 'Manage' and save your `ClientID`.
-* Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
-* `go get -u "github.com/seanbreckenridge/twitchlive"`
-* Download `config.yaml.example` to `$HOME/.config/twitchlive/config`:
-* `curl --output "$HOME/.config/twitchlive/config" --create-dirs "https://raw.githubusercontent.com/seanbreckenridge/twitchlive/master/config.yaml.example"`
-* ... and modify so that it has your twitch `user_name`/`client_id`
+* Twitch API
+    * Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
+    * Click 'Manage' and save your `ClientID`.
+    * Download `config.yaml.example` to `$HOME/.config/twitchlive/config`, and modify so that it has your twitch `user_name`/`client_id`
+* Go/Install `twitchlive`
+    * Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
+    * Run: `go get -u "github.com/seanbreckenridge/twitchlive"`
 
 ## Run
 
@@ -59,7 +59,8 @@ if twitchlive -output-format=json | jq -r '.channels | .[] | "\(.user_name)"' | 
 fi
 ```
 
-### Full Usage
+### Usage
+
 ```
 Usage for twitchlive:
   -delimiter string
