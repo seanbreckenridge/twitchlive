@@ -4,7 +4,7 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 
 ### Setup
 
-* Go to [the dev console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
+* Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
 * Click 'Manage' and save your `ClientID`.
 * Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
 * `go get -u "github.com/seanbreckenridge/twitchlive"`
@@ -73,6 +73,3 @@ Usage for twitchlive:
   -username string
     	specify user to get live channels for
 ```
-
-### Dependencies:
-
