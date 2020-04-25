@@ -42,7 +42,7 @@ twitchlive -username=<some_other_username> -output-format=table
 +---------------+--------+--------------+-------------------------------------+
 ```
 
-### JSON:
+JSON:
 
 As an example use case, get average viewer count of channels I follow which are currently live:
 
@@ -74,3 +74,5 @@ Usage for twitchlive:
   -username string
     	specify user to get live channels for
 ```
+
+Passing the `username` flag overrides the `user_name` set in `~/.config/twitchlive/config`
