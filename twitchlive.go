@@ -27,10 +27,11 @@ const (
 )
 
 type liveChannel struct {
-	user_name    string
-	title        string
-	viewer_count int
-	started_at   time.Time
+	user_name      string
+	title          string
+	viewer_count   int
+	started_at     time.Time
+	formatted_time string
 }
 
 // Configuration passed from user using flags and config file
@@ -242,17 +243,45 @@ func getLiveUsers(conf *config, followedUsers []string) []liveChannel {
 }
 
 func main() {
+
+	// parse configuration
 	conf := GetConfig()
-	// fmt.Printf("%+v\n", *conf)
+
+	// make requests to twitch API
 	userId := getUserId(conf)
 	followedUsers := getFollowingChannels(conf, userId, nil, make([]string, 0))
-	getLiveUsers := getLiveUsers(conf, followedUsers)
-	for _, live_user := range getLiveUsers {
-		fmt.Println(strings.Join([]string{
-			live_user.user_name,
-			live_user.title,
-			strconv.Itoa(live_user.viewer_count),
-			live_user.started_at.Format(time.UnixDate)},
-			(*conf).delimiter))
+	liveUsers := getLiveUsers(conf, followedUsers)
+
+	// format output according to flags
+	for index, live_user := range liveUsers {
+		if conf.timestamp_seconds {
+			liveUsers[index].formatted_time = live_user.started_at.Format(time.UnixDate)
+		} else if conf.timestamp {
+			liveUsers[index].formatted_time = strconv.Itoa(int(live_user.started_at.Unix()))
+		} else {
+			// default, display how long they've been in live
+			timeDiff := time.Now().Sub(live_user.started_at)
+			// format into HH:MM
+			hours := timeDiff / time.Hour
+			timeDiff -= hours * time.Hour
+			minutes := timeDiff / time.Minute
+			liveUsers[index].formatted_time = fmt.Sprintf("%02d:%02d", hours, minutes)
+		}
 	}
+
+	switch conf.output_format {
+	case OutputFormatBasic:
+		for _, live_user := range liveUsers {
+			fmt.Println(strings.Join([]string{live_user.user_name,
+				live_user.title,
+				strconv.Itoa(live_user.viewer_count),
+				live_user.formatted_time},
+				(*conf).delimiter))
+		}
+	case OutputFormatTable,
+		OutputFormatJson:
+		fmt.Fprintf(os.Stderr, "Output Type '%s' is not implemented yet... FeelsBadMan\n", conf.output_format)
+		os.Exit(1)
+	}
+
 }
