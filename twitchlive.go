@@ -1,10 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -120,10 +121,17 @@ func makeRequest(request *http.Request, client *http.Client) (*http.Response, st
 	if err != nil {
 		log.Fatalf("Error making HTTP request: %s\n", err)
 	}
-	// check response
 	defer response.Body.Close()
-	respBytes, _ := ioutil.ReadAll(response.Body)
-	respBody := string(respBytes)
+
+	// read response
+	scanner := bufio.NewScanner(response.Body)
+	scanner.Split(bufio.ScanRunes)
+	var buf bytes.Buffer
+	for scanner.Scan() {
+		buf.WriteString(scanner.Text())
+	}
+	respBody := buf.String()
+
 	// dump information to screen and exit if it failed
 	if response.StatusCode >= 400 {
 		log.Printf("Requesting %s failed with status code %d\n", request.URL.String(), response.StatusCode)
