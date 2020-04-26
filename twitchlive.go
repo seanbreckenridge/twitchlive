@@ -63,7 +63,7 @@ func parseOutputFormat(format *string) (OutputFormat, error) {
 		OutputFormatJson:
 		return passedFormat, nil
 	}
-	return OutputFormatBasic, fmt.Errorf("Could not find '%s' in allowed output formats. Run %s -h for a full list.", (*format), os.Args[0])
+	return OutputFormatBasic, fmt.Errorf("Could not find '%s' in allowed output formats. Run %s -h for a full list.", *format, os.Args[0])
 }
 
 // read the configuration from command line flags
@@ -91,7 +91,6 @@ func getConfig() *config {
 		log.Fatalf("%s\n", err)
 	}
 
-	// TODO: add json output, and a nicer table output as flags
 	// read configuration file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -261,12 +260,12 @@ func main() {
 
 	// make requests to twitch API
 	client := &http.Client{}
-	(*conf).user_id = getUserId(conf, client)
+	conf.user_id = getUserId(conf, client)
 	followedUsers := getFollowingChannels(conf, client, nil, make([]string, 0))
 	liveUsers := getLiveUsers(conf, client, followedUsers)
 
-	now := time.Now()
 	// format output according to flags
+	now := time.Now()
 	for index, live_user := range liveUsers {
 		if conf.timestamp_seconds {
 			liveUsers[index].Formatted_time = strconv.Itoa(int(live_user.started_at.Unix()))
@@ -283,6 +282,7 @@ func main() {
 		}
 	}
 
+	// print, according to output format
 	switch conf.output_format {
 	case OutputFormatBasic:
 		for _, live_user := range liveUsers {
