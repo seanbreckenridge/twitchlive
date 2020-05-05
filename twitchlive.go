@@ -44,7 +44,8 @@ type jsonContainer struct {
 // Configuration passed from user using flags and config file
 // and additional metadata (user id) pass around with requests
 type config struct {
-	clientId          string
+	client_id         string
+	bearer_token      string
 	user_name         string
 	user_id           string
 	delimiter         string
@@ -104,7 +105,8 @@ func getConfig() *config {
 		(*username) = viper.GetString("username")
 	}
 	return &config{
-		clientId:          viper.GetString("client_id"),
+		client_id:         viper.GetString("client_id"),
+		bearer_token:      viper.GetString("token"),
 		user_name:         *username,
 		delimiter:         *delimiter,
 		output_format:     output_format,
@@ -113,9 +115,27 @@ func getConfig() *config {
 	}
 }
 
+// twitch API can return banned users, make sure there are no dupliates
+// https://www.reddit.com/r/golang/comments/5ia523/idiomatic_way_to_remove_duplicates_in_a_slice/db6qa2e/
+func SliceUniqMap(s []string) []string {
+	seen := make(map[string]struct{}, len(s))
+	j := 0
+	for _, v := range s {
+		if _, ok := seen[v]; ok {
+			continue
+		}
+		seen[v] = struct{}{}
+		s[j] = v
+		j++
+	}
+	return s[:j]
+}
+
 // makes an HTTP request and returns the response and body, as long as its valid
 func makeRequest(request *http.Request, client *http.Client) (*http.Response, string) {
 	// make request
+	// fmt.Println(request.URL.String())
+
 	response, err := client.Do(request)
 	if err != nil {
 		log.Fatalf("Error making HTTP request: %s\n", err)
@@ -130,6 +150,7 @@ func makeRequest(request *http.Request, client *http.Client) (*http.Response, st
 		buf.WriteString(scanner.Text())
 	}
 	respBody := buf.String()
+	// println(respBody)
 
 	// dump information to screen and exit if it failed
 	if response.StatusCode >= 400 {
@@ -144,7 +165,8 @@ func makeRequest(request *http.Request, client *http.Client) (*http.Response, st
 func getUserId(conf *config, client *http.Client) string {
 	req, _ := http.NewRequest("GET", BASEURL+"users", nil)
 	// set client header
-	req.Header.Set("Client-Id", conf.clientId)
+	req.Header.Set("Client-Id", conf.client_id)
+	req.Header.Set("Authorization", "Bearer "+conf.bearer_token)
 	// create query string
 	q := req.URL.Query()
 	q.Add("login", conf.user_name)
@@ -161,7 +183,8 @@ func getUserId(conf *config, client *http.Client) string {
 func getFollowingChannels(conf *config, client *http.Client, paginationCursor *string, followedUsers []string) []string {
 	// create request
 	req, _ := http.NewRequest("GET", BASEURL+"users/follows", nil)
-	req.Header.Set("Client-Id", conf.clientId)
+	req.Header.Set("Client-Id", conf.client_id)
+	req.Header.Set("Authorization", "Bearer "+conf.bearer_token)
 
 	// create query
 	q := req.URL.Query()
@@ -205,7 +228,8 @@ func createLiveUsersURL(conf *config, followedUsers []string, startAt int, endAt
 
 	// create the URL
 	req, _ := http.NewRequest("GET", BASEURL+"streams", nil)
-	req.Header.Set("Client-Id", conf.clientId)
+	req.Header.Set("Client-Id", conf.client_id)
+	req.Header.Set("Authorization", "Bearer "+conf.bearer_token)
 	q := req.URL.Query()
 	// specify how many values to return (all of them, if 100 streamers happened to be live)
 	// if you sent 100 users and only 10 of them were live, it would only return the value
@@ -262,7 +286,7 @@ func main() {
 	client := &http.Client{}
 	conf.user_id = getUserId(conf, client)
 	followedUsers := getFollowingChannels(conf, client, nil, make([]string, 0))
-	liveUsers := getLiveUsers(conf, client, followedUsers)
+	liveUsers := getLiveUsers(conf, client, SliceUniqMap(followedUsers))
 
 	// format output according to flags
 	now := time.Now()

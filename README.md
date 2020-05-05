@@ -4,10 +4,14 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 
 ### Setup
 
+Twitch API for CLI applications WeirdChamp
+
 - Twitch API
-  - Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; you can use `http://localhost` as the callback URL, it won't be used for this application.
+  - Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; set the callback URL to `http://localhost`.
   - Click 'Manage' and save your `ClientID`.
   - Download `config.yaml.example` to `$HOME/.config/twitchlive/config`, and modify so that it has your twitch `username`/`client_id`
+  - Go to `https://id.twitch.tv/oauth2/authorize?redirect_uri=http://localhost&response_type=token&scope=&client_id=<YOUR_CLIENT_ID>`, replacing `YOUR_CLIENT_ID` with yours. That should redirect to you to localhost; the URL contains a query parameter with the `access_token`. Copy that into the `token` field in your config file.
+  - You can test this with the following: `curl --verbose -H "Client-Id <CLIENT ID>" -H "Authorization: Bearer <ACCESS TOKEN>" "https://api.twitch.tv/helix/games/top"`
 - Go/Install `twitchlive`
   - Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
   - Run: `go get -u "github.com/seanbreckenridge/twitchlive"`
