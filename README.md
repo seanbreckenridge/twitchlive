@@ -14,7 +14,7 @@ Twitch API for CLI applications WeirdChamp
   - You can test this with the following: `curl --verbose -H "Client-Id <CLIENT ID>" -H "Authorization: Bearer <ACCESS TOKEN>" "https://api.twitch.tv/helix/games/top"`
 - Go/Install `twitchlive`
   - Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
-  - Run: `go get -u "github.com/seanbreckenridge/twitchlive"`
+  - Run: `go get -u "gitlab.com/seanbreckenridge/twitchlive"`
 
 ## Run
 
