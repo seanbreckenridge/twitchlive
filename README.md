@@ -60,7 +60,7 @@ $ twitchlive -output-format=json \
 ... or check if a particular channel is live, by `grep`ing against the output.
 
 ```
-if twitchlive -output-format=json | jq -r '.channels | .[] | "\(.username)"' | grep -xq xqcow; then
+if twitchlive -output-format=json | jq -r '.channels | .[] | "\(.username)"' | grep -ixq xqcow; then
     echo "Pepega is live."
 fi
 ```
