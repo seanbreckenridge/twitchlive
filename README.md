@@ -24,7 +24,7 @@ Basic Text Output:
 $ twitchlive # uses username in ~/.config/twitchlive/config
 ```
 
-You can use the `--delimeter` flag to specify what to separate each field with.
+You can use the `-delimeter` flag to specify what to separate each field with.
 
 Table Output:
 
