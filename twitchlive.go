@@ -223,6 +223,24 @@ func min(a, b int) int {
 	return b
 }
 
+// truncates strings more than 30 characters
+// This is used to truncate titles,
+// so it doesnt break table formatting
+func truncate(title string) string {
+	var buffer strings.Builder
+	parts := strings.Split(title, " ")
+	for _, token := range parts {
+		if len(token) > 30 {
+			buffer.WriteString(token[0:28])
+			buffer.WriteString("--")
+		} else {
+			buffer.WriteString(token)
+		}
+		buffer.WriteString(" ")
+	}
+	return buffer.String()
+}
+
 // create the giant URL to request currently live users for getLiveUsers
 func createLiveUsersURL(conf *config, followedUsers []string, startAt int, endAt int) (*http.Request, int) {
 
@@ -330,7 +348,7 @@ func main() {
 				live_user.User_name,
 				live_user.Formatted_time,
 				strconv.Itoa(live_user.Viewer_count),
-				live_user.Title,
+				truncate(live_user.Title),
 			}
 		}
 		table := tablewriter.NewWriter(os.Stdout)
