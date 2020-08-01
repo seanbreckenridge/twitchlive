@@ -37,10 +37,6 @@ type liveChannelInfo struct {
 	Formatted_time string `json:"time"`
 }
 
-type jsonContainer struct {
-	Channels []liveChannelInfo `json:"channels"`
-}
-
 // Configuration passed from user using flags and config file
 // and additional metadata (user id) pass around with requests
 type config struct {
@@ -336,7 +332,7 @@ func main() {
 				(*conf).delimiter))
 		}
 	case OutputFormatJson:
-		jsonBytes, err := json.Marshal(&jsonContainer{Channels: liveUsers})
+		jsonBytes, err := json.Marshal(liveUsers)
 		if err != nil {
 			log.Fatalf("Error encoding to JSON: %s\n", err)
 		}

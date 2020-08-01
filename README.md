@@ -52,7 +52,7 @@ As an example use case, get average viewer count of channels I follow which are 
 
 ```
 $ twitchlive -output-format=json \
-| jq -r '.channels | .[] | "\(.viewer_count)"'\
+| jq -r '.[] | "\(.viewer_count)"'\
 | awk '{total += $0} END { print int(total/NR) }'
 5611
 ```
@@ -60,7 +60,7 @@ $ twitchlive -output-format=json \
 ... or check if a particular channel is live, by `grep`ing against the output.
 
 ```
-if twitchlive -output-format=json | jq -r '.channels | .[] | "\(.username)"' | grep -ixq xqcow; then
+if twitchlive -output-format=json | jq -r '.[] | "\(.username)"' | grep -ixq xqcow; then
     echo "Pepega is live."
 fi
 ```
