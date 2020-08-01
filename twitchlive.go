@@ -238,7 +238,7 @@ func truncate(title string) string {
 		}
 		buffer.WriteString(" ")
 	}
-	return buffer.String()
+	return strings.TrimSpace(buffer.String())
 }
 
 // create the giant URL to request currently live users for getLiveUsers
