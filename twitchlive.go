@@ -73,7 +73,7 @@ func getConfig() *config {
 		flag.PrintDefaults()
 	}
 	// define command line flags
-	delimiter := flag.String("delimiter", " @@@ ", "string to separate entires when printing")
+	delimiter := flag.String("delimiter", " | ", "string to separate entires when printing")
 	username := flag.String("username", "", "specify user to get live channels for")
 	output_format_str := flag.String("output-format", "basic", "possible values: 'basic', 'table', 'json'")
 	timestamp := flag.Bool("timestamp", false, "print unix timestamp instead of stream duration")

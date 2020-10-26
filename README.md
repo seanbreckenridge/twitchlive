@@ -70,7 +70,7 @@ fi
 ```
 Usage for twitchlive:
   -delimiter string
-    	string to separate entires when printing (default " @@@ ")
+    	string to separate entires when printing (default " | ")
   -output-format string
     	possible values: 'basic', 'table', 'json' (default "basic")
   -timestamp
