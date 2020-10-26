@@ -85,6 +85,5 @@ Passing the `username` flag overrides the `username` set in `~/.config/twitchliv
 
 #### TODO:
 
-* The access token seems to expire every few months (Last expired 
-Tue Aug 24 2020). Document this when it expires again
+* The access token seems to expire every 2 months. Its possible to add a server to receive this using a template/JS
 
