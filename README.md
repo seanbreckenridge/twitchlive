@@ -82,7 +82,3 @@ Usage for twitchlive:
 ```
 
 Passing the `username` flag overrides the `username` set in `~/.config/twitchlive/config`
-
-#### TODO:
-
-- The access token seems to expire every 2 months. Its possible to add a server to receive this using a template/JS
