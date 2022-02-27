@@ -7,7 +7,7 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 - Setup the [`twitch-cli`](https://dev.twitch.tv/docs/api/) tool, that handles storing and refreshing the token to a file. That expires every 2 months, can be refreshed by running `twitch token`
 - Go/Install `twitchlive`
   - Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
-  - Run: `go install -u "github.com/seanbreckenridge/twitchlive@latest"`
+  - Run: `go install "github.com/seanbreckenridge/twitchlive@latest"`
 
 ## Run
 
