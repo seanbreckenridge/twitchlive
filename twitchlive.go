@@ -67,7 +67,7 @@ func parseOutputFormat(format *string) (OutputFormat, error) {
 func envOrFail(key string) string {
 	val, present := os.LookupEnv(key)
 	if !present {
-		log.Fatalf("$%s is not set as an environment variable, or wasn't set in the twitch-cli env file\n", val)
+		log.Fatalf("$%s is not set as an environment variable, or wasn't set in the twitch-cli env file\n", key)
 	}
 	return val
 }
