@@ -15,12 +15,12 @@ Basic Text Output:
 
 ```
 $ twitchlive
-xQcOW | 01:01 | 61407 | (CLICK HERE) CHILL THEN WORLD FIRST FINALE ELDEN RING BEATING. SMALL SKELETON MAN DESTROYS EVERY MONSTER AND OBSTACLE TO BECOME ELDEN LORD
+xQcOW | 01:01 | 61407 | (CLICK HERE) CHILL THEN WORLD FIRST FINALE ELDEN RING BEATING
 Sykkuno | 04:26 | 24326 | chill day
-DisguisedToast | 02:19 | 8245 | Detective Al Rashio | GTA RP | No Pixel | Killing more horses in Elden Ring
+DisguisedToast | 02:19 | 8245 | Detective Al Rashio | GTA RP | No Pixel
 boxbox | 00:53 | 3646 | 70 lp to challenger PauseChamp i might be here
 Scarra | 05:10 | 2367 | valo -> LOST ARK  | !vods
-baoo | 00:46 | 1327 | First Date With Ywuria !valentinemerch !soundalerts !tits
+baoo | 00:46 | 1327 | First Date With Ywuria !valentinemerch !soundalerts
 ```
 
 You can use the `-delimeter` flag to specify what to separate each field with.
