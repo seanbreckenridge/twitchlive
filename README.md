@@ -15,6 +15,12 @@ Basic Text Output:
 
 ```
 $ twitchlive
+xQcOW | 01:01 | 61407 | (CLICK HERE) CHILL THEN WORLD FIRST FINALE ELDEN RING BEATING. SMALL SKELETON MAN DESTROYS EVERY MONSTER AND OBSTACLE TO BECOME ELDEN LORD
+Sykkuno | 04:26 | 24326 | chill day
+DisguisedToast | 02:19 | 8245 | Detective Al Rashio | GTA RP | No Pixel | Killing more horses in Elden Ring
+boxbox | 00:53 | 3646 | 70 lp to challenger PauseChamp i might be here
+Scarra | 05:10 | 2367 | valo -> LOST ARK  | !vods
+baoo | 00:46 | 1327 | First Date With Ywuria !valentinemerch !soundalerts !tits
 ```
 
 You can use the `-delimeter` flag to specify what to separate each field with.
@@ -31,9 +37,6 @@ twitchlive -username=<some_other_username> -output-format=table
 | sodapoppin    | 06:42  |        14003 | serkfgjhlbnlsebfoldtghnodilurngudrg |
 | LilyPichu     | 04:01  |         7676 | hhiiiii                             |
 | Mizkif        | 08:47  |         6742 | YO GET IN HERE                      |
-| Trainwreckstv | 00:49  |         3337 | recap + ban appeals | !twitter      |
-|               |        |              | | !podcast                          |
-| Greekgodx     | 07:34  |         2868 | @Greekgodx on Twitter               |
 | SirhcEz       | 01:44  |         1430 | SINGEEDDDDDD | SirhcEz cafe &       |
 |               |        |              | chill | #LeaguePartner              |
 +---------------+--------+--------------+-------------------------------------+
