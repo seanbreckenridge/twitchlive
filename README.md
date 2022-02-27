@@ -77,5 +77,3 @@ Usage for twitchlive:
   -username string
     	specify user to get live channels for
 ```
-
-Passing the `username` flag overrides the `username` set in `~/.config/twitchlive/config`
