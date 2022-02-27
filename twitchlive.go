@@ -9,12 +9,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/olekukonko/tablewriter"
-	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
 )
 
@@ -63,6 +64,14 @@ func parseOutputFormat(format *string) (OutputFormat, error) {
 	return OutputFormatBasic, fmt.Errorf("Could not find '%s' in allowed output formats. Run %s -h for a full list.", *format, os.Args[0])
 }
 
+func envOrFail(key string) string {
+	val, present := os.LookupEnv(key)
+	if !present {
+		log.Fatalf("$%s is not set as an environment variable, or wasn't set in the twitch-cli env file\n", val)
+	}
+	return val
+}
+
 // read the configuration from command line flags
 // and the configuration file
 func getConfig() *config {
@@ -72,9 +81,13 @@ func getConfig() *config {
 		fmt.Fprintf(os.Stderr, "%s\n\nUsage for %s:\n", DESCRIPTION, os.Args[0])
 		flag.PrintDefaults()
 	}
+
+	defaultTwitchCliPath := path.Join(envOrFail("HOME"), ".config", "twitch-cli", ".twitch-cli.env")
+
 	// define command line flags
 	delimiter := flag.String("delimiter", " | ", "string to separate entires when printing")
 	username := flag.String("username", "", "specify user to get live channels for")
+	twitch_cli_path := flag.String("twitch-cli-env-path", defaultTwitchCliPath, "path to the twitch-cli config file")
 	output_format_str := flag.String("output-format", "basic", "possible values: 'basic', 'table', 'json'")
 	timestamp := flag.Bool("timestamp", false, "print unix timestamp instead of stream duration")
 	timestamp_seconds := flag.Bool("timestamp-seconds", false, "print seconds since epoch instead of unix timestamp")
@@ -88,21 +101,22 @@ func getConfig() *config {
 		log.Fatalf("%s\n", err)
 	}
 
-	// read configuration file
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("$XDG_CONFIG_HOME/twitchlive")
-	viper.AddConfigPath("$HOME/.config/twitchlive")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file: %s\n", err)
+	dotenvErr := godotenv.Load(*twitch_cli_path)
+	if dotenvErr != nil {
+		log.Fatalf("Error loading twitch-cli env file: %s\n", dotenvErr)
 	}
-	// default to username from config file if one wasnt set
+
 	if *username == "" {
-		(*username) = viper.GetString("username")
+		*username = os.Getenv("TWITCH_USERNAME")
 	}
+
+	if *username == "" {
+		log.Fatalln("No username set -- pass the -username flag or set the TWITCH_USERNAME environment variable")
+	}
+
 	return &config{
-		client_id:         viper.GetString("client_id"),
-		bearer_token:      viper.GetString("token"),
+		client_id:         envOrFail("CLIENTID"),
+		bearer_token:      envOrFail("ACCESSTOKEN"),
 		user_name:         *username,
 		delimiter:         *delimiter,
 		output_format:     output_format,

@@ -4,14 +4,7 @@ A CLI tool to list which [twitch](https://www.twitch.tv/) channels you follow ar
 
 ### Setup
 
-Twitch API for CLI applications WeirdChamp
-
-- Twitch API
-  - Go to the [twitch developer console](https://dev.twitch.tv/console/apps) and create a application; set the callback URL to `http://localhost`.
-  - Click 'Manage' and save your `ClientID`.
-  - Download `config.yaml.example` to `$HOME/.config/twitchlive/config`, and modify so that it has your twitch `username`/`client_id`
-  - Go to `https://id.twitch.tv/oauth2/authorize?redirect_uri=http://localhost&response_type=token&scope=&client_id=<YOUR_CLIENT_ID>`, replacing `YOUR_CLIENT_ID` with yours. That should redirect to you to localhost; the URL contains a query parameter with the `access_token`. Copy that into the `token` field in your config file.
-  - You can test this with the following: `curl --verbose -H "Client-Id <CLIENT ID>" -H "Authorization: Bearer <ACCESS TOKEN>" "https://api.twitch.tv/helix/games/top"`
+- Setup the [`twitch-cli`](https://dev.twitch.tv/docs/api/) tool, that handles storing and refreshing the token to a file. That expires every 2 months, can be refreshed by running `twitch token`
 - Go/Install `twitchlive`
   - Install [go](https://golang.org/) if you haven't already, make sure your `$GOPATH` and `$GOBIN` environment variables are set.
   - Run: `go install -u "github.com/seanbreckenridge/twitchlive@latest"`
@@ -21,7 +14,7 @@ Twitch API for CLI applications WeirdChamp
 Basic Text Output:
 
 ```
-$ twitchlive # uses username in ~/.config/twitchlive/config
+$ twitchlive
 ```
 
 You can use the `-delimeter` flag to specify what to separate each field with.
@@ -68,6 +61,8 @@ fi
 ### Usage
 
 ```
+A CLI tool to list which twitch channels you follow are currently live.
+
 Usage for twitchlive:
   -delimiter string
     	string to separate entires when printing (default " | ")
@@ -77,6 +72,8 @@ Usage for twitchlive:
     	print unix timestamp instead of stream duration
   -timestamp-seconds
     	print seconds since epoch instead of unix timestamp
+  -twitch-cli-env-path string
+    	path to the twitch-cli config file (default "/home/sean/.config/twitch-cli/.twitch-cli.env")
   -username string
     	specify user to get live channels for
 ```
