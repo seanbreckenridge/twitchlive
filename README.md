@@ -68,7 +68,7 @@ A CLI tool to list which twitch channels you follow are currently live.
 
 Usage for twitchlive:
   -delimiter string
-    	string to separate entires when printing (default " | ")
+    	string to separate entries when printing (default " | ")
   -output-format string
     	possible values: 'basic', 'table', 'json' (default "basic")
   -timestamp

@@ -85,7 +85,7 @@ func getConfig() *config {
 	defaultTwitchCliPath := path.Join(envOrFail("HOME"), ".config", "twitch-cli", ".twitch-cli.env")
 
 	// define command line flags
-	delimiter := flag.String("delimiter", " | ", "string to separate entires when printing")
+	delimiter := flag.String("delimiter", " | ", "string to separate entries when printing")
 	username := flag.String("username", "", "specify user to get live channels for")
 	twitch_cli_path := flag.String("twitch-cli-env-path", defaultTwitchCliPath, "path to the twitch-cli config file")
 	output_format_str := flag.String("output-format", "basic", "possible values: 'basic', 'table', 'json'")
@@ -125,7 +125,7 @@ func getConfig() *config {
 	}
 }
 
-// twitch API can return banned users, make sure there are no dupliates
+// twitch API can return banned users, make sure there are no duplicates
 // https://www.reddit.com/r/golang/comments/5ia523/idiomatic_way_to_remove_duplicates_in_a_slice/db6qa2e/
 func SliceUniqMap(s []string) []string {
 	seen := make(map[string]struct{}, len(s))
@@ -217,7 +217,7 @@ func getFollowingChannels(conf *config, client *http.Client, paginationCursor *s
 		followedUsers = append(followedUsers, id.String())
 	}
 
-	// if we havent got all of the items yet, do a recursive call
+	// if we haven't got all of the items yet, do a recursive call
 	if len(followedUsers) < followCount {
 		cursor := gjson.Get(respBody, "pagination.cursor").String()
 		followedUsers = getFollowingChannels(conf, client, &cursor, followedUsers)
@@ -235,7 +235,7 @@ func min(a, b int) int {
 
 // truncates strings more than 30 characters
 // This is used to truncate titles,
-// so it doesnt break table formatting
+// so it doesn't break table formatting
 func truncate(title string) string {
 	var buffer strings.Builder
 	parts := strings.Split(title, " ")
@@ -279,7 +279,7 @@ func createLiveUsersURL(conf *config, followedUsers []string, startAt int, endAt
 // get currently live users from followedUsers.
 // Since you can only specify 100 IDs,
 // and you also return 100 IDs at a time using the 'first' param,
-// pagination isnt needed on this endpoint.
+// pagination isn't needed on this endpoint.
 func getLiveUsers(conf *config, client *http.Client, followedUsers []string) []liveChannelInfo {
 
 	// instantiate return array
